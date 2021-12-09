@@ -1,89 +1,91 @@
+
 const { REQUEST_METHODS, STATUS_CODES} = require('../../constants/constants');
 const { ERRORS } = require('../../constants/errors');
 
 const {sendResponseEnd} = require('../../helpers/response');
-const {getAllUsers, getById, createUser, updateUser, deleteUser} = require('./user.service')
-
+const {getAllBoards, getByID, createBoard, updateBoard, deleteBoard} = require('./board.service')
 
 const {requestDataExtractor} = require('../../helpers/requestExtractor');
-const { postObjValidator, putObjValidator } = require('../../validators/validators');
+const {postBoardObjValidator, putBoardObjValidator} = require('../../validators/validators');
 
 const uuidValidator = /(\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b)/;
-const urlValidator = /\/users\/.+/;
+const urlValidator = /\/boards\/.+/;
 
 
-const usersController = (request, response) =>{
-    if(request.method === REQUEST_METHODS.GET && request.url === '/users' ){
-        sendResponseEnd(response, STATUS_CODES.OK, getAllUsers());
+const boardsController = (request, response) =>{ 
+    if(request.method === REQUEST_METHODS.GET && request.url === '/boards' ){
+        sendResponseEnd(response, STATUS_CODES.OK, getAllBoards());
     }
     else if(request.method === REQUEST_METHODS.GET && urlValidator.test(request.url)){
-        const userId = request.url.split('/')[2];
-        if(!uuidValidator.test(userId)){
+        const boardId = request.url.split('/')[2];
+        if(!uuidValidator.test(boardId)){
             return sendResponseEnd(response, STATUS_CODES.BAD_REQUEST, ERRORS.WRONG_ID_FORMAT);  
         }
         
-            const getResult = getById(userId);
-            if(getResult === ERRORS.USER_NOT_FOUND){
+            const getResult = getByID(boardId);
+            if(typeof getResult === 'string'){
                 return sendResponseEnd(response, STATUS_CODES.NOT_FOUND, getResult);
             }
             return sendResponseEnd(response, STATUS_CODES.OK, getResult);
         
     }
-    else if(request.method === REQUEST_METHODS.POST && request.url === '/users'){
+    else if(request.method === REQUEST_METHODS.POST && request.url === '/boards'){
         requestDataExtractor(request)
-            .then(postData => {
-                let dataObj;
+            .then(postBoard => {
+                let boardObj;
                 try{
-                    dataObj = JSON.parse(postData);
+                    boardObj = JSON.parse(postBoard);
                 }
                 catch (err){
                     return sendResponseEnd(response, STATUS_CODES.SERVER_ERROR, ERRORS.JSON_PARSE_ERR);
                 };
-                const validationError = postObjValidator(dataObj);
+                const validationError = postBoardObjValidator(boardObj)
                 if(validationError === undefined){
-                    const user = createUser(dataObj);
-                    return sendResponseEnd(response, STATUS_CODES.CREATED, user)
+                    const board = createBoard(boardObj);
+                    return sendResponseEnd(response, STATUS_CODES.CREATED, board)
                 }
-                return sendResponseEnd(response, STATUS_CODES.BAD_REQUEST, validationError);
+                sendResponseEnd(response, STATUS_CODES.BAD_REQUEST, validationError);
             });
     }
     else if(request.method === REQUEST_METHODS.PUT && urlValidator.test(request.url)){
-        const userId = request.url.split('/')[2];
-        if(!uuidValidator.test(userId)){
+        const boardId = request.url.split('/')[2];
+        if(!uuidValidator.test(boardId)){
             return sendResponseEnd(response, STATUS_CODES.BAD_REQUEST, ERRORS.WRONG_ID_FORMAT);  
         };
         return requestDataExtractor(request)
-        .then(putData => {
-            let putDataObj;
+        .then(putBoard => {
+            let putBoardObj;
             try{
-                putDataObj = JSON.parse(putData);
+                putBoardObj = JSON.parse(putBoard);
+                console.log(putBoardObj);
             }
             catch (err){ 
                 return sendResponseEnd(response, STATUS_CODES.SERVER_ERROR, ERRORS.JSON_PARSE_ERR);
             }
-            const validationError = putObjValidator(putDataObj);
+            const validationError = putBoardObjValidator(putBoardObj);
             if(validationError == undefined){
-                const updateResult = updateUser(putDataObj, userId);
-                if(typeof updateResult === 'string'){
-                    return sendResponseEnd(response, STATUS_CODES.NOT_FOUND, updateResult)
+                const updatedBoard = updateBoard( putBoardObj, boardId)
+                if(typeof updatedBoard === 'string'){
+                    return sendResponseEnd(response, STATUS_CODES.NOT_FOUND, updatedBoard);
                 }
-                return sendResponseEnd(response, STATUS_CODES.OK, updateResult);
+                return sendResponseEnd(response, STATUS_CODES.OK, updatedBoard);
             }
             return sendResponseEnd(response, STATUS_CODES.BAD_REQUEST, validationError);
         })
+    
     }
     else if(request.method === REQUEST_METHODS.DELETE && urlValidator.test(request.url)){
-        const userId = request.url.split('/')[2];
-        if(!uuidValidator.test(userId)){
+        const boardId = request.url.split('/')[2];
+        if(!uuidValidator.test(boardId)){
             return sendResponseEnd(response, STATUS_CODES.BAD_REQUEST, ERRORS.WRONG_ID_FORMAT);
         };
-        const deletionResult = deleteUser(userId);
+        const deletionResult = deleteBoard(boardId);
+        
         if(typeof deletionResult === 'string'){
             return sendResponseEnd(response, STATUS_CODES.NOT_FOUND, deletionResult);
         }
         return sendResponseEnd(response, deletionResult);
     }
-
 }
 
-module.exports = {usersController};
+module.exports = {boardsController};

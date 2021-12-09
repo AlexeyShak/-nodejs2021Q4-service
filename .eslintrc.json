@@ -14,12 +14,13 @@
     }
   },
   "settings": {
-    "noInlineConfig": true
+    "noInlineConfig": true,
+    "noParamReassign": false,
+    "noPlusplus": false
+
   },
   "extends": [
-    "eslint:recommended",
     "plugin:node/recommended",
-    "airbnb-base",
     "prettier"
   ],
   "rules": {

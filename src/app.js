@@ -1,24 +1,30 @@
-const express = require('express');
-const swaggerUI = require('swagger-ui-express');
-const path = require('path');
-const YAML = require('yamljs');
-const userRouter = require('./resources/users/user.router');
+const http = require('http');
 
-const app = express();
-const swaggerDocument = YAML.load(path.join(__dirname, '../doc/api.yaml'));
+const {usersController} = require('./resources/users/user.router');
+const {tasksController} = require('./resources/tasks/task.router');
+const {boardsController} = require('./resources/boards/board.router');
 
-app.use(express.json());
+const { sendResponseEnd } = require('./helpers/response');
+const {STATUS_CODES} = require('./constants/constants');
+const {ERRORS} = require('./constants/errors')
 
-app.use('/doc', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
+module.exports = http.createServer((request, response) => {
+    try{
+        const {url} = request;
+        if(url.startsWith('/users')){
+            return usersController(request, response);
+        }
+        else if(url.startsWith('/boards')){
+          if(url.includes('/tasks')){
+              return tasksController(request,response);
+          }
+          return boardsController(request, response);
+      }
+       
+        return sendResponseEnd(response, STATUS_CODES.NOT_FOUND, ERRORS.UNKNOWN_URL)
+    }catch (e){
+        console.log('error e:', e)
+        response.end(JSON.stringify(e));
+    }
 
-app.use('/', (req, res, next) => {
-  if (req.originalUrl === '/') {
-    res.send('Service is running!');
-    return;
-  }
-  next();
-});
-
-app.use('/users', userRouter);
-
-module.exports = app;
+})
