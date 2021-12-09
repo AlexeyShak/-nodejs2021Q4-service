@@ -1,72 +1,140 @@
-# RS School REST service
+# REST service
+REST service task at RS school
 
-## Prerequisites
+This app contains REST service using in-memory database underneath and operates with the following resources:
+- User (with attributes):
+    { id, name, login, password };
+- Board (set of columns):
+    { id, title, columns };
+- Column (set of tasks):
+    { id, title, order };
+- Task:
+    {
+    id,
+    title,
+    order,
+    description,
+    userId, //assignee
+    boardId,
+    columnId
+    }.
+# How to use
 
-- Git - [Download & Install Git](https://git-scm.com/downloads).
-- Node.js - [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager.
+## Prerequiremenst 
+ git Clone repository, swich to development branch,  run ```npm i ``` in your terminal.
+  
+1. Run the comand ```npm run start``` in your terminal.
 
-## Downloading
+2. To checkup your requests on server recomended to use API Platform(Postman, RESTClient, etc.) If you  dont want to install separate API Platform you can install browser extension.
+(for Chrome you can get it here https://chrome.google.com/webstore/detail/advanced-rest-client/hgmloofddffdnphfgcellkdfbfbjeloo ). 
 
-```
-git clone {repository URL}
-```
+# Operations avaliable:
+## for users:
+- GET request with URL `http://localhost:{PORT}/users` to GET all users;
 
-## Installing NPM modules
+- GET request with URL `http://localhost:{PORT}/users/{userId}` to GET user with corresponding userId;
 
-```
-npm install
-```
+- POST request with URL `http://localhost:{PORT}/users` to add user.  
+    User creates in a body of the POST request and has the object type.
+    example:  
+        **{   
+                "name": "Ivan",  
+                "login": "ivanTheTerrible",  
+                "password": "qwerty123456"
+                }**.  
+ID will be generated automaticali with uuid.
 
-## Running application
+*NOTE: all the object properties are required and their values must be of the set type 'String'.
 
-```
-npm start
-```
+- PUT request with URL `http://localhost:{PORT}/users/{userId}` to edit user with corresponding userId. 
+    User eddings requared in the body of the PUT request and also has the object type.
+    example:  
+        **{ 
+                "login": "ivanWhiteAndFluffy"  
+                "password": "LF__PLMmpmwkjnfwjin438834nwfewiwn39nsd"
+                }**.  
 
-After starting the app on port (4000 as default) you can open
-in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
-For more information about OpenAPI/Swagger please visit https://swagger.io/.
+*NOTE: NOT all the object properties are required but their values must be of the set types (String for "name", "login", "password").
 
-## Testing
+-DELETE request with URL `http://localhost:{PORT}/person/{personId}` to delete user with corresponding userID. 
 
-After application running open new terminal and enter:
+## for Boards: 
 
-To run all tests without authorization
+- GET request with URL `http://localhost:{PORT}/boards` to GET all boards;
 
-```
-npm test
-```
+- GET request with URL `http://localhost:{PORT}/boards/{boardId}` to GET board with corresponding boardId;
 
-To run only one of all test suites (users, boards or tasks)
+- POST request with URL `http://localhost:{PORT}/boards` to add board.  
+    Board creates in a body of the POST request and has the object type.
+    example:  
+        **{ "title": "example board",  
+                    "columns":  
+                        [{  
+                            "id": "00000000-0000-0000-0000-000000000000",  
+                            "title": "random column",  
+                            "order": "string"  
+                        }, ...]}**
+                
 
-```
-npm test <suite name>
-```
 
-To run all test with authorization
+*NOTE: all the object properties are required and their values must be of the set type (String for "title", Array for "columns")
 
-```
-npm run test:auth
-```
+- PUT request with URL `http://localhost:{PORT}/boards/{boardId}` to edit board with corresponding boardId. 
+    Board eddings requared in the body of the PUT request and also has the object type.
+    example:  
+        **{ 
+                "title": "New Board" 
+                }**.  
 
-To run only specific test suite with authorization (users, boards or tasks)
+*NOTE: NOT all the object properties are required but their values must be of the set types (String for "title", Array for "columns").
 
-```
-npm run test:auth <suite name>
-```
+-DELETE request with URL `http://localhost:{PORT}/boards/{boardId}` to delete board with corresponding boardID.  
+*NOTE: After deletition of the board all its Tasks will be deleted as well.
 
-## Development
+## for Tasks: 
+- GET request with URL `http://localhost:{PORT}/boards/{boardId}/tasks` to GET all tasks;
 
-If you're using VSCode, you can get a better developer experience from integration with [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) extensions.
+- GET request with URL `http://localhost:{PORT}/boards/{boardId}/tasks/{taskId}` to GET task with corresponding taskId;
 
-### Auto-fix and format
+- POST request with URL `http://localhost:{PORT}/boards/tasks` to add task.  
+    Task creates in a body of the POST request and has the object type.
+    example:  
+        **{     "title": "Random task",  
+    "order": "Random order",  
+    "description": "Some description",  
+    "userId": null,  
+    "columnId": "c8f746c3-7089-4abc-af07-d66c5548b8f0",  
+    "boardId": "c8f746c3-7089-4abc-af07-d66c5548b8f0"
+    }**
+                
 
-```
-npm run lint
-```
 
-### Debugging in VSCode
+*NOTE: all the object properties are required and their values must be of the set type (String for all proprties values, userId might be Null)
 
-Press <kbd>F5</kbd> to debug.
+- PUT request with URL `http://localhost:{PORT}/boards/{boardId}/tasks/{taskId}` to edit task with corresponding boardId. 
+    Board eddings requared in the body of the PUT request and also has the object type.
+    example:  
+        **{      "title": "Random task",  
+    "order": "Random order",  
+    "description": "Some description",  
+    "userId": null,  
+                }**.  
 
-For more information, visit: https://code.visualstudio.com/docs/editor/debugging
+*NOTE: NOT all the object properties are required but their values must be of the set types (String for all proprties values, userId might be Null).
+
+-DELETE request with URL `http://localhost:{PORT}/boards/{boardId}` to delete task with corresponding taskID.  
+*NOTE: After deletition of the board all its Tasks will be deleted as well.
+
+#Testing
+1. Run the comand ```npm run test``` in your terminal.
+
+
+
+
+
+
+
+
+
+
+
