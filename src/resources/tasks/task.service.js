@@ -77,7 +77,7 @@ const deleteTask = (boardId, taskId) => {
     return STATUS_CODES.NO_CONTENT;
 }
 
-function deleteByBoardId(boardId){
+const deleteByBoard = (boardId) => {
     tasks = tasks.filter(el => el.boardId !== boardId);
 }
 
@@ -91,4 +91,4 @@ const unassignUserAfterDelete = (userId) =>{
 
 
 
-module.exports = {getAllTasks, getTaskById, createTask, updateTask, deleteTask, deleteByBoardId, unassignUserAfterDelete}
+module.exports = {getAllTasks, getTaskById, createTask, updateTask, deleteTask, deleteByBoard, unassignUserAfterDelete}

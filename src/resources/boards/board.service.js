@@ -3,10 +3,9 @@ const {v4: uuidv4} = require('uuid');
 const { ERRORS } = require('../../constants/errors');
 const {STATUS_CODES} = require('../../constants/constants');
 let {boards} = require('./board.memory.repository');
-const {deleteByBoardId} = require('../tasks/task.service');
+let {tasks} = require('../tasks/task.memory.repository');
 
-
-const getAllBoards = () =>boards
+const getAllBoards = () => boards
 
 const getByID = (boardId) => {
     const result = boards.find(el => el.id === boardId);
@@ -38,7 +37,7 @@ const deleteBoard = (boardId) => {
         return ERRORS.BOARD_NOT_FOUND
     }
     boards = result;
-    deleteByBoardId(boardId);
+    tasks = tasks.filter(el => el.boardId !== boardId);
     return STATUS_CODES.NO_CONTENT;
 }
 

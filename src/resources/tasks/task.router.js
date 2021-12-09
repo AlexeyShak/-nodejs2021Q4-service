@@ -24,7 +24,6 @@ const tasksController = (request, response) =>{
         return sendResponseEnd(response, STATUS_CODES.OK, getResult);
     }
     if(request.method === REQUEST_METHODS.GET && taskIdUrlValidator.test(request.url)){
-        console.log('taskid:', request.url)
         const boardId = request.url.split('/')[2];
         if(!uuidValidator.test(boardId)){
             return sendResponseEnd(response, STATUS_CODES.BAD_REQUEST, ERRORS.WRONG_ID_FORMAT);  
